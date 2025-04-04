@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Responsive World Time Zone Clock</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1em;
+      background-color: #f0f8ff;
+    }
+    .clock-container {
+      text-align: center;
+      border-radius: 1.25em;
+      padding: 2em;
+      box-shadow: 0 1em 1.5em rgba(0, 0, 0, 0.15);
+      width: 90%;
+      max-width: 480px;
+      background: linear-gradient(135deg, #6e8efb, #a777e3);
+      color: white;
+      transition: background 0.5s ease;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.8rem;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+      letter-spacing: 1px;
+    }
+    .time {
+      font-size: clamp(3rem, 8vw, 4rem);
+      font-weight: bold;
+      margin: 0.3em 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.05em;
+      word-break: break-word;
+    }
+    .ampm-inline {
+      font-size: 0.4em;
+      font-weight: bold;
+      margin-left: 0.4em;
+      background-color: rgba(255, 255, 255, 0.3);
+      padding: 0.3em 0.6em;
+      border-radius: 0.5em;
+      vertical-align: middle;
+    }
+    .date {
+      font-size: 1.3rem;
+      margin-bottom: 25px;
+      opacity: 0.9;
+    }
+    select {
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.25);
+      color: white;
+      font-size: 1rem;
+      margin-top: 15px;
+      width: 100%;
+      max-width: 280px;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: background-color 0.3s;
+    }
+    select:hover {
+      background-color: rgba(255, 255, 255, 0.35);
+    }
+    select option {
+      background-color: #6e8efb;
+      color: white;
+    }
+    .timezone-name {
+      margin-top: 15px;
+      font-size: 1.1rem;
+      opacity: 0.8;
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .seconds {
+      color: #ffeb3b;
+    }
+    .theme-selector {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .theme-option {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      transition: transform 0.2s, border 0.2s;
+    }
+    .theme-option:hover {
+      transform: scale(1.1);
+      border: 2px solid white;
+    }
+    .theme-option.active {
+      border: 3px solid white;
+      transform: scale(1.1);
+    }
+    .theme-label {
+      width: 100%;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Responsive Tweaks */
+    @media (max-width: 480px) {
+      .clock-container {
+        padding: 1.5em;
+      }
+      .date {
+        font-size: 1rem;
+      }
+      select {
+        font-size: 0.9rem;
+        max-width: 100%;
+      }
+      .timezone-name {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="clock-container" id="clock-container">
+    <h2>World Time Zone Clock</h2>
+    <div class="time">
+      <span id="clock">00:00:00</span><span class="ampm-inline" id="ampm">AM</span>
+    </div>
+    <div class="date" id="date">Monday, January 1, 2023</div>
+    <div class="timezone-name" id="timezone-name">Coordinated Universal Time (UTC)</div>
+
+    <select id="timezone-select">
+      <option value="UTC">UTC - Coordinated Universal Time</option>
+      <option value="America/New_York">EST/EDT - New York</option>
+      <option value="America/Chicago">CST/CDT - Chicago</option>
+      <option value="America/Denver">MST/MDT - Denver</option>
+      <option value="America/Los_Angeles">PST/PDT - Los Angeles</option>
+      <option value="Europe/London">GMT/BST - London</option>
+      <option value="Europe/Paris">CET/CEST - Paris</option>
+      <option value="Asia/Tokyo">JST - Tokyo</option>
+      <option value="Australia/Sydney">AEST/AEDT - Sydney</option>
+      <option value="Pacific/Auckland">NZST/NZDT - Auckland</option>
+      <option value="Asia/Dubai">GST - Dubai</option>
+      <option value="Asia/Singapore">SGT - Singapore</option>
+      <option value="Asia/Kolkata">IST - India</option>
+    </select>
+
+    <div class="theme-selector">
+      <div class="theme-label">Choose Theme:</div>
+      <div class="theme-option active" id="theme-1" style="background: linear-gradient(135deg, #6e8efb, #a777e3);" title="Purple Blue"></div>
+      <div class="theme-option" id="theme-2" style="background: linear-gradient(135deg, #ff9966, #ff5e62);" title="Orange Red"></div>
+      <div class="theme-option" id="theme-3" style="background: linear-gradient(135deg, #36d1dc, #5b86e5);" title="Cyan Blue"></div>
+      <div class="theme-option" id="theme-4" style="background: linear-gradient(135deg, #6441a5, #2a0845);" title="Deep Purple"></div>
+      <div class="theme-option" id="theme-5" style="background: linear-gradient(135deg, #11998e, #38ef7d);" title="Green"></div>
+      <div class="theme-option" id="theme-6" style="background: linear-gradient(135deg, #f953c6, #b91d73);" title="Pink"></div>
+      <div class="theme-option" id="theme-7" style="background: linear-gradient(135deg, #141e30, #243b55);" title="Dark Blue"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const clockElement = document.getElementById('clock');
+      const ampmElement = document.getElementById('ampm');
+      const dateElement = document.getElementById('date');
+      const timezoneSelect = document.getElementById('timezone-select');
+      const timezoneNameElement = document.getElementById('timezone-name');
+      const clockContainer = document.getElementById('clock-container');
+      const themeOptions = document.querySelectorAll('.theme-option');
+
+      const themes = {
+        'theme-1': 'linear-gradient(135deg, #6e8efb, #a777e3)',
+        'theme-2': 'linear-gradient(135deg, #ff9966, #ff5e62)',
+        'theme-3': 'linear-gradient(135deg, #36d1dc, #5b86e5)',
+        'theme-4': 'linear-gradient(135deg, #6441a5, #2a0845)',
+        'theme-5': 'linear-gradient(135deg, #11998e, #38ef7d)',
+        'theme-6': 'linear-gradient(135deg, #f953c6, #b91d73)',
+        'theme-7': 'linear-gradient(135deg, #141e30, #243b55)'
+      };
+
+      themeOptions.forEach(option => {
+        option.addEventListener('click', function () {
+          themeOptions.forEach(opt => opt.classList.remove('active'));
+          this.classList.add('active');
+          clockContainer.style.background = themes[this.id];
+        });
+      });
+
+      try {
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (userTimezone) {
+          const options = Array.from(timezoneSelect.options);
+          const userTimezoneOption = options.find(option => option.value === userTimezone);
+          if (userTimezoneOption) {
+            timezoneSelect.value = userTimezone;
+          }
+        }
+      } catch (e) {
+        console.error("Could not detect user timezone:", e);
+      }
+
+      function updateClock() {
+        const selectedTimezone = timezoneSelect.value;
+        const now = new Date();
+
+        const timeOptions12 = {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true,
+          timeZone: selectedTimezone
+        };
+
+        const dateOptions = {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          timeZone: selectedTimezone
+        };
+
+        const dateFormatter = new Intl.DateTimeFormat('en-US', timeOptions12);
+        const parts = dateFormatter.formatToParts(now);
+
+        const hour = parts.find(part => part.type === 'hour').value;
+        const minute = parts.find(part => part.type === 'minute').value;
+        const second = parts.find(part => part.type === 'second').value;
+        const dayPeriod = parts.find(part => part.type === 'dayPeriod').value;
+
+        const timeString = `${hour}:${minute}:<span class="seconds">${second}</span>`;
+        clockElement.innerHTML = timeString;
+        ampmElement.textContent = dayPeriod;
+
+        dateElement.textContent = new Intl.DateTimeFormat('en-US', dateOptions).format(now);
+
+        let tzName;
+        try {
+          tzName = new Intl.DateTimeFormat('en-US', {
+            timeZoneName: 'long',
+            timeZone: selectedTimezone
+          }).formatToParts(now).find(part => part.type === 'timeZoneName').value;
+        } catch (e) {
+          tzName = selectedTimezone.replace('_', ' ');
+        }
+
+        timezoneNameElement.textContent = tzName;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+      timezoneSelect.addEventListener('change', updateClock);
+    });
+  </script>
+</body>
+</html>
