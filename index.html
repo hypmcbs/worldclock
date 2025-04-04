@@ -15,17 +15,18 @@
       margin: 0;
       padding: 1em;
       background-color: #f0f8ff;
+      color: #333;
     }
     .clock-container {
       text-align: center;
       border-radius: 1.25em;
       padding: 2em;
-      box-shadow: 0 1em 1.5em rgba(0, 0, 0, 0.15);
+      box-shadow: 0 0.5em 1.5em rgba(0, 0, 0, 0.15);
       width: 90%;
       max-width: 480px;
       background: linear-gradient(135deg, #6e8efb, #a777e3);
       color: white;
-      transition: background 0.5s ease;
+      transition: all 0.5s ease;
     }
     h2 {
       margin-top: 0;
@@ -55,22 +56,38 @@
       margin-bottom: 25px;
       opacity: 0.9;
     }
+    .settings-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin-top: 15px;
+    }
+    .setting-label {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-bottom: 8px;
+      width: 100%;
+      text-align: left;
+      padding-left: 10%;
+    }
     select {
-      padding: 10px 15px;
+      padding: 12px 15px;
       border-radius: 10px;
       border: none;
       background-color: rgba(255, 255, 255, 0.25);
       color: white;
       font-size: 1rem;
-      margin-top: 15px;
-      width: 100%;
+      margin-bottom: 15px;
+      width: 80%;
       max-width: 280px;
       cursor: pointer;
       backdrop-filter: blur(5px);
       transition: background-color 0.3s;
     }
-    select:hover {
+    select:hover, select:focus {
       background-color: rgba(255, 255, 255, 0.35);
+      outline: 2px solid rgba(255, 255, 255, 0.5);
     }
     select option {
       background-color: #6e8efb;
@@ -89,11 +106,12 @@
       color: #ffeb3b;
     }
     .theme-selector {
-      margin-top: 20px;
+      margin-top: 10px;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
+      width: 80%;
     }
     .theme-option {
       width: 30px;
@@ -102,6 +120,7 @@
       cursor: pointer;
       border: 2px solid rgba(255, 255, 255, 0.5);
       transition: transform 0.2s, border 0.2s;
+      position: relative;
     }
     .theme-option:hover {
       transform: scale(1.1);
@@ -111,11 +130,100 @@
       border: 3px solid white;
       transform: scale(1.1);
     }
-    .theme-label {
-      width: 100%;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      opacity: 0.8;
+    .theme-option::after {
+      content: attr(title);
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .theme-option:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    .format-switch {
+      display: flex;
+      align-items: center;
+      margin: 15px 0;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      margin: 0 10px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.25);
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+    input:focus + .slider {
+      box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .popular-cities {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      width: 90%;
+    }
+    .city-button {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .city-button:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+    .city-button.active {
+      background-color: rgba(255, 255, 255, 0.5);
+      font-weight: bold;
     }
 
     /* Responsive Tweaks */
@@ -133,6 +241,13 @@
       .timezone-name {
         font-size: 0.95rem;
       }
+      .popular-cities {
+        width: 100%;
+      }
+      .city-button {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
@@ -145,31 +260,52 @@
     <div class="date" id="date">Monday, January 1, 2023</div>
     <div class="timezone-name" id="timezone-name">Coordinated Universal Time (UTC)</div>
 
-    <select id="timezone-select">
-      <option value="UTC">UTC - Coordinated Universal Time</option>
-      <option value="America/New_York">EST/EDT - New York</option>
-      <option value="America/Chicago">CST/CDT - Chicago</option>
-      <option value="America/Denver">MST/MDT - Denver</option>
-      <option value="America/Los_Angeles">PST/PDT - Los Angeles</option>
-      <option value="Europe/London">GMT/BST - London</option>
-      <option value="Europe/Paris">CET/CEST - Paris</option>
-      <option value="Asia/Tokyo">JST - Tokyo</option>
-      <option value="Australia/Sydney">AEST/AEDT - Sydney</option>
-      <option value="Pacific/Auckland">NZST/NZDT - Auckland</option>
-      <option value="Asia/Dubai">GST - Dubai</option>
-      <option value="Asia/Singapore">SGT - Singapore</option>
-      <option value="Asia/Kolkata">IST - India</option>
-    </select>
+    <div class="popular-cities" id="popular-cities">
+      <button class="city-button active" data-timezone="UTC">UTC</button>
+      <button class="city-button" data-timezone="America/New_York">New York</button>
+      <button class="city-button" data-timezone="Europe/London">London</button>
+      <button class="city-button" data-timezone="Europe/Paris">Paris</button>
+      <button class="city-button" data-timezone="Asia/Tokyo">Tokyo</button>
+      <button class="city-button" data-timezone="Asia/Singapore">Singapore</button>
+    </div>
 
-    <div class="theme-selector">
-      <div class="theme-label">Choose Theme:</div>
-      <div class="theme-option active" id="theme-1" style="background: linear-gradient(135deg, #6e8efb, #a777e3);" title="Purple Blue"></div>
-      <div class="theme-option" id="theme-2" style="background: linear-gradient(135deg, #ff9966, #ff5e62);" title="Orange Red"></div>
-      <div class="theme-option" id="theme-3" style="background: linear-gradient(135deg, #36d1dc, #5b86e5);" title="Cyan Blue"></div>
-      <div class="theme-option" id="theme-4" style="background: linear-gradient(135deg, #6441a5, #2a0845);" title="Deep Purple"></div>
-      <div class="theme-option" id="theme-5" style="background: linear-gradient(135deg, #11998e, #38ef7d);" title="Green"></div>
-      <div class="theme-option" id="theme-6" style="background: linear-gradient(135deg, #f953c6, #b91d73);" title="Pink"></div>
-      <div class="theme-option" id="theme-7" style="background: linear-gradient(135deg, #141e30, #243b55);" title="Dark Blue"></div>
+    <div class="settings-section">
+      <div class="setting-label">Time Zone:</div>
+      <select id="timezone-select">
+        <option value="UTC">UTC - Coordinated Universal Time</option>
+        <option value="America/New_York">EST/EDT - New York</option>
+        <option value="America/Chicago">CST/CDT - Chicago</option>
+        <option value="America/Denver">MST/MDT - Denver</option>
+        <option value="America/Los_Angeles">PST/PDT - Los Angeles</option>
+        <option value="Europe/London">GMT/BST - London</option>
+        <option value="Europe/Paris">CET/CEST - Paris</option>
+        <option value="Asia/Tokyo">JST - Tokyo</option>
+        <option value="Australia/Sydney">AEST/AEDT - Sydney</option>
+        <option value="Pacific/Auckland">NZST/NZDT - Auckland</option>
+        <option value="Asia/Dubai">GST - Dubai</option>
+        <option value="Asia/Singapore">SGT - Singapore</option>
+        <option value="Asia/Kolkata">IST - India</option>
+      </select>
+
+      <div class="format-switch">
+        <span>12-hour</span>
+        <label class="switch">
+          <input type="checkbox" id="format-toggle">
+          <span class="slider"></span>
+        </label>
+        <span>24-hour</span>
+      </div>
+
+      <div class="setting-label">Theme:</div>
+      <div class="theme-selector">
+        <div class="theme-option active" id="theme-1" style="background: linear-gradient(135deg, #6e8efb, #a777e3);" title="Purple Blue"></div>
+        <div class="theme-option" id="theme-2" style="background: linear-gradient(135deg, #ff9966, #ff5e62);" title="Orange Red"></div>
+        <div class="theme-option" id="theme-3" style="background: linear-gradient(135deg, #36d1dc, #5b86e5);" title="Cyan Blue"></div>
+        <div class="theme-option" id="theme-4" style="background: linear-gradient(135deg, #6441a5, #2a0845);" title="Deep Purple"></div>
+        <div class="theme-option" id="theme-5" style="background: linear-gradient(135deg, #11998e, #38ef7d);" title="Green"></div>
+        <div class="theme-option" id="theme-6" style="background: linear-gradient(135deg, #f953c6, #b91d73);" title="Pink"></div>
+        <div class="theme-option" id="theme-7" style="background: linear-gradient(135deg, #141e30, #243b55);" title="Dark Blue"></div>
+      </div>
     </div>
   </div>
 
@@ -182,6 +318,42 @@
       const timezoneNameElement = document.getElementById('timezone-name');
       const clockContainer = document.getElementById('clock-container');
       const themeOptions = document.querySelectorAll('.theme-option');
+      const formatToggle = document.getElementById('format-toggle');
+      const cityButtons = document.querySelectorAll('.city-button');
+      
+      // For storing user preferences
+      const userPrefs = {
+        is24Hour: false,
+        theme: 'theme-1',
+        timezone: 'UTC'
+      };
+
+      // Try to load user preferences from localStorage
+      try {
+        const savedPrefs = localStorage.getItem('worldClockPrefs');
+        if (savedPrefs) {
+          const parsedPrefs = JSON.parse(savedPrefs);
+          userPrefs.is24Hour = parsedPrefs.is24Hour || false;
+          userPrefs.theme = parsedPrefs.theme || 'theme-1';
+          userPrefs.timezone = parsedPrefs.timezone || 'UTC';
+          
+          // Apply saved preferences
+          formatToggle.checked = userPrefs.is24Hour;
+          timezoneSelect.value = userPrefs.timezone;
+          
+          // Apply saved theme
+          themeOptions.forEach(opt => opt.classList.remove('active'));
+          document.getElementById(userPrefs.theme).classList.add('active');
+          clockContainer.style.background = themes[userPrefs.theme];
+          
+          // Update active city button
+          cityButtons.forEach(button => {
+            button.classList.toggle('active', button.dataset.timezone === userPrefs.timezone);
+          });
+        }
+      } catch (e) {
+        console.error("Error loading preferences:", e);
+      }
 
       const themes = {
         'theme-1': 'linear-gradient(135deg, #6e8efb, #a777e3)',
@@ -193,38 +365,93 @@
         'theme-7': 'linear-gradient(135deg, #141e30, #243b55)'
       };
 
+      // Theme selection
       themeOptions.forEach(option => {
         option.addEventListener('click', function () {
           themeOptions.forEach(opt => opt.classList.remove('active'));
           this.classList.add('active');
           clockContainer.style.background = themes[this.id];
+          
+          // Save theme preference
+          userPrefs.theme = this.id;
+          savePreferences();
         });
       });
 
+      // Format toggle
+      formatToggle.addEventListener('change', function() {
+        userPrefs.is24Hour = this.checked;
+        savePreferences();
+        updateClock();
+      });
+
+      // City buttons
+      cityButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const timezone = this.dataset.timezone;
+          timezoneSelect.value = timezone;
+          userPrefs.timezone = timezone;
+          
+          // Update active state
+          cityButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          savePreferences();
+          updateClock();
+        });
+      });
+
+      // Try to detect and set user's timezone
       try {
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        if (userTimezone) {
+        if (userTimezone && !localStorage.getItem('worldClockPrefs')) {
           const options = Array.from(timezoneSelect.options);
           const userTimezoneOption = options.find(option => option.value === userTimezone);
           if (userTimezoneOption) {
             timezoneSelect.value = userTimezone;
+            userPrefs.timezone = userTimezone;
+            
+            // Update active city button if it matches the detected timezone
+            cityButtons.forEach(button => {
+              button.classList.toggle('active', button.dataset.timezone === userTimezone);
+            });
           }
         }
       } catch (e) {
         console.error("Could not detect user timezone:", e);
       }
 
+      function savePreferences() {
+        try {
+          localStorage.setItem('worldClockPrefs', JSON.stringify(userPrefs));
+        } catch (e) {
+          console.error("Could not save preferences:", e);
+        }
+      }
+
       function updateClock() {
         const selectedTimezone = timezoneSelect.value;
         const now = new Date();
+        const is24Hour = formatToggle.checked;
 
-        const timeOptions12 = {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: true,
-          timeZone: selectedTimezone
-        };
+        let timeOptions;
+        if (is24Hour) {
+          timeOptions = {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+            timeZone: selectedTimezone
+          };
+        } else {
+          timeOptions = {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+            timeZone: selectedTimezone
+          };
+        }
 
         const dateOptions = {
           weekday: 'long',
@@ -234,17 +461,24 @@
           timeZone: selectedTimezone
         };
 
-        const dateFormatter = new Intl.DateTimeFormat('en-US', timeOptions12);
+        const dateFormatter = new Intl.DateTimeFormat('en-US', timeOptions);
         const parts = dateFormatter.formatToParts(now);
 
         const hour = parts.find(part => part.type === 'hour').value;
         const minute = parts.find(part => part.type === 'minute').value;
         const second = parts.find(part => part.type === 'second').value;
-        const dayPeriod = parts.find(part => part.type === 'dayPeriod').value;
-
-        const timeString = `${hour}:${minute}:<span class="seconds">${second}</span>`;
+        
+        let timeString = `${hour}:${minute}:<span class="seconds">${second}</span>`;
         clockElement.innerHTML = timeString;
-        ampmElement.textContent = dayPeriod;
+        
+        // Show/hide AM/PM based on format
+        if (is24Hour) {
+          ampmElement.style.display = 'none';
+        } else {
+          const dayPeriod = parts.find(part => part.type === 'dayPeriod')?.value || '';
+          ampmElement.textContent = dayPeriod;
+          ampmElement.style.display = 'inline';
+        }
 
         dateElement.textContent = new Intl.DateTimeFormat('en-US', dateOptions).format(now);
 
@@ -261,9 +495,23 @@
         timezoneNameElement.textContent = tzName;
       }
 
+      // Update timezone selector when changed
+      timezoneSelect.addEventListener('change', function() {
+        const selectedTimezone = this.value;
+        userPrefs.timezone = selectedTimezone;
+        
+        // Update active city button
+        cityButtons.forEach(button => {
+          button.classList.toggle('active', button.dataset.timezone === selectedTimezone);
+        });
+        
+        savePreferences();
+        updateClock();
+      });
+
+      // Initialize
       updateClock();
       setInterval(updateClock, 1000);
-      timezoneSelect.addEventListener('change', updateClock);
     });
   </script>
 </body>
